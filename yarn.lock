@@ -44,7 +44,7 @@
   dependencies:
     "buffer" "~6.0.3"
 
-"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.2.0":
+"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.2.0", "@solana/web3.js@^1.28.0":
   "integrity" "sha512-9sCXVVsRNR8MO4Ww3yyTYLXqNmpz7qX0wVeKHpwYtLTzKh3inncGOniYwpYPFRwEo8ivh0Q+c/GM2EnUHOviRg=="
   "resolved" "https://registry.npmjs.org/@solana/web3.js/-/web3.js-1.28.0.tgz"
   "version" "1.28.0"

@@ -6,9 +6,10 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod demobase_alpha {
     use super::*;
 
-    pub fn create_collection(ctx: Context<CreateCollection>) -> ProgramResult {
+    pub fn create_collection(ctx: Context<CreateCollection>, bump: u8) -> ProgramResult {
         msg!("Create collection");
         ctx.accounts.collection.count = 0;
+        ctx.accounts.collection.bump = bump;
         ctx.accounts.collection.authority = ctx.accounts.authority.key();
         Ok(())
     }
@@ -35,8 +36,15 @@ pub mod demobase_alpha {
 }
 
 #[derive(Accounts)]
+#[instruction(bump: u8)]
 pub struct CreateCollection<'info> {
-    #[account(init, payer = authority, space = 8 + 40)]
+    #[account(
+        init, 
+        payer = authority, 
+        space = 8 + 32 + 8 + 1, 
+        seeds = [b"collection".as_ref()], 
+        bump = bump
+    )]
     pub collection: Account<'info, Collection>,
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -80,6 +88,7 @@ pub struct DeleteDocument<'info> {
 pub struct Collection {
     pub authority: Pubkey,
     pub count: u64,
+    pub bump: u8, 
 }
 
 #[account]
