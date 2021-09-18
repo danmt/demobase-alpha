@@ -36,7 +36,7 @@ pub mod demobase_alpha {
 
 #[derive(Accounts)]
 pub struct CreateCollection<'info> {
-    #[account(init, payer = authority, space = 8 + 40, has_one = authority)]
+    #[account(init, payer = authority, space = 8 + 40)]
     pub collection: Account<'info, Collection>,
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -45,11 +45,11 @@ pub struct CreateCollection<'info> {
 
 #[derive(Accounts)]
 pub struct CreateDocument<'info> {
-    #[account(init, payer = authority, space = 8 + 64, has_one = authority)]
+    #[account(init, payer = authority, space = 8 + 64)]
     pub document: Account<'info, Document>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account()]
+    #[account(mut)]
     pub collection: Account<'info, Collection>,
     pub system_program: Program<'info, System>,
 }
@@ -71,7 +71,7 @@ pub struct DeleteDocument<'info> {
     pub document: Account<'info, Document>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account()]
+    #[account(mut)]
     pub collection: Account<'info, Collection>,
     pub system_program: Program<'info, System>,
 }
