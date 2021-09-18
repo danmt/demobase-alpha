@@ -1,5 +1,5 @@
-const anchor = require('@project-serum/anchor');
-const { assert } = require('chai');
+import * as anchor from '@project-serum/anchor';
+import { assert } from 'chai';
 
 describe('demobase-alpha', () => {
   // Configure the client to use the local cluster.
@@ -9,6 +9,8 @@ describe('demobase-alpha', () => {
   const document1 = anchor.web3.Keypair.generate();
 
   it('should create collection', async () => {
+    // arrange
+
     // act
     await program.rpc.createCollection({
       accounts: {
