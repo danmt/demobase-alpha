@@ -1,12 +1,19 @@
-import * as anchor from '@project-serum/anchor';
+import {
+  BN,
+  Provider,
+  setProvider,
+  utils,
+  web3,
+  workspace,
+} from '@project-serum/anchor';
 import { assert } from 'chai';
 
 describe('demobase-alpha', () => {
   // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.Provider.env());
-  const program = anchor.workspace.DemobaseAlpha;
-  const collection = anchor.web3.Keypair.generate();
-  const document1 = anchor.web3.Keypair.generate();
+  setProvider(Provider.env());
+  const program = workspace.DemobaseAlpha;
+  const collection = web3.Keypair.generate();
+  const document1 = web3.Keypair.generate();
 
   it('should create collection', async () => {
     // arrange
@@ -16,7 +23,7 @@ describe('demobase-alpha', () => {
       accounts: {
         collection: collection.publicKey,
         authority: program.provider.wallet.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
+        systemProgram: web3.SystemProgram.programId,
       },
       signers: [collection],
     });
@@ -39,7 +46,7 @@ describe('demobase-alpha', () => {
         document: document1.publicKey,
         collection: collection.publicKey,
         authority: program.provider.wallet.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
+        systemProgram: web3.SystemProgram.programId,
       },
       signers: [document1],
     });
@@ -50,12 +57,12 @@ describe('demobase-alpha', () => {
     const documentAccount = await program.account.document.fetch(
       document1.publicKey
     );
-    assert.ok(collectionAccount.count.eq(new anchor.BN(1)));
+    assert.ok(collectionAccount.count.eq(new BN(1)));
     assert.ok(
       documentAccount.authority.equals(program.provider.wallet.publicKey)
     );
     assert.equal(
-      anchor.utils.bytes.utf8.decode(
+      utils.bytes.utf8.decode(
         new Uint8Array(
           documentAccount.content.filter((segment) => segment !== 0)
         )
@@ -73,7 +80,7 @@ describe('demobase-alpha', () => {
         document: document1.publicKey,
         collection: collection.publicKey,
         authority: program.provider.wallet.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
+        systemProgram: web3.SystemProgram.programId,
       },
     });
     // assert
@@ -81,7 +88,7 @@ describe('demobase-alpha', () => {
       document1.publicKey
     );
     assert.equal(
-      anchor.utils.bytes.utf8.decode(
+      utils.bytes.utf8.decode(
         new Uint8Array(
           documentAccount.content.filter((segment) => segment !== 0)
         )
@@ -97,13 +104,13 @@ describe('demobase-alpha', () => {
         document: document1.publicKey,
         collection: collection.publicKey,
         authority: program.provider.wallet.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
+        systemProgram: web3.SystemProgram.programId,
       },
     });
     // assert
     const collectionAccount = await program.account.collection.fetch(
       collection.publicKey
     );
-    assert.ok(collectionAccount.count.eq(new anchor.BN(0)));
+    assert.ok(collectionAccount.count.eq(new BN(0)));
   });
 });
