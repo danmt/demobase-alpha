@@ -66,7 +66,7 @@ pub struct CreateCollection<'info> {
     #[account(
         init, 
         payer = authority, 
-        space = 8 + 32 + 32 + 8 + 1, 
+        space = 8 + 32 + 1 + 32 + 8, 
         seeds = [
             b"collection", 
             application.key().as_ref()
@@ -87,7 +87,7 @@ pub struct CreateDocument<'info> {
     #[account(
         init, 
         payer = authority, 
-        space = 8 + 32 + 32 + 32 + 32 + 1,
+        space = 8 + 32 + 1 + 32 + 32 + 32,
         seeds = [
             b"document", 
             application.key().as_ref(),
@@ -132,9 +132,9 @@ pub struct Application {
 #[account]
 pub struct Collection {
     pub authority: Pubkey,
+    pub bump: u8, 
     pub application: Pubkey,
     pub count: u64,
-    pub bump: u8, 
 }
 
 #[account]
