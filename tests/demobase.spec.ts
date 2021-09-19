@@ -15,10 +15,10 @@ import {
   findDocumentAddress,
 } from './utils';
 
-describe('demobase-alpha', () => {
+describe('demobase', () => {
   // Configure the client to use the local cluster.
   setProvider(Provider.env());
-  const program = workspace.DemobaseAlpha;
+  const program = workspace.Demobase;
   const application = Keypair.generate();
   let collectionBump: number, documentBump: number;
 

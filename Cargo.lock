@@ -393,7 +393,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "demobase-alpha"
+name = "demobase"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
