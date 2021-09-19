@@ -1,20 +1,30 @@
 import { PublicKey } from '@solana/web3.js';
+
 import { DEMOBASE_PROGRAM_ID } from './constants';
 
-export const findCollectionAddress = (applicationId: PublicKey) => {
+export const findCollectionAddress = (
+  applicationId: PublicKey,
+  name: string
+) => {
   return PublicKey.findProgramAddress(
-    [Buffer.from('collection', 'utf8'), applicationId.toBuffer()],
+    [
+      Buffer.from('collection', 'utf8'),
+      Buffer.from(name, 'utf-8'),
+      applicationId.toBuffer(),
+    ],
     DEMOBASE_PROGRAM_ID
   );
 };
 
 export const createCollectionAddress = (
   applicationId: PublicKey,
+  name: string,
   bump: number
 ) => {
   return PublicKey.createProgramAddress(
     [
       Buffer.from('collection', 'utf-8'),
+      Buffer.from(name, 'utf-8'),
       applicationId.toBuffer(),
       Uint8Array.from([bump]),
     ],

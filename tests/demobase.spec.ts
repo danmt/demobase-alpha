@@ -44,12 +44,14 @@ describe('demobase', () => {
 
   it('should create collection', async () => {
     // arrange
+    const collectionName = 'things';
     const [collection, bump] = await findCollectionAddress(
-      application.publicKey
+      application.publicKey,
+      collectionName
     );
     collectionBump = bump;
     // act
-    await program.rpc.createCollection(bump, {
+    await program.rpc.createCollection(collectionName, bump, {
       accounts: {
         collection,
         application: application.publicKey,
@@ -73,8 +75,10 @@ describe('demobase', () => {
 
   it('should create document', async () => {
     // arrange
+    const collectionName = 'things';
     const collection = await createCollectionAddress(
       application.publicKey,
+      collectionName,
       collectionBump
     );
     const [document, bump] = await findDocumentAddress(
@@ -114,8 +118,10 @@ describe('demobase', () => {
 
   it('should update document', async () => {
     // arrange
+    const collectionName = 'things';
     const collection = await createCollectionAddress(
       application.publicKey,
+      collectionName,
       collectionBump
     );
     const document = await createDocumentAddress(
@@ -147,8 +153,10 @@ describe('demobase', () => {
 
   it('should delete document', async () => {
     // arrange
+    const collectionName = 'things';
     const collection = await createCollectionAddress(
       application.publicKey,
+      collectionName,
       collectionBump
     );
     const document = await createDocumentAddress(
