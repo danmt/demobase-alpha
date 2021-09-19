@@ -23,8 +23,10 @@ describe('demobase', () => {
   let collectionBump: number, documentBump: number;
 
   it('should create application', async () => {
+    // arrange
+    const applicationName = 'myApp';
     // act
-    await program.rpc.createApplication({
+    await program.rpc.createApplication(applicationName, {
       accounts: {
         application: application.publicKey,
         authority: program.provider.wallet.publicKey,
