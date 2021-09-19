@@ -3,34 +3,63 @@ import {
   Provider,
   setProvider,
   utils,
-  web3,
   workspace,
 } from '@project-serum/anchor';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { assert } from 'chai';
-import { findCollectionAddress } from './utils';
 
 describe('demobase-alpha', () => {
   // Configure the client to use the local cluster.
   setProvider(Provider.env());
   const program = workspace.DemobaseAlpha;
-  const document1 = web3.Keypair.generate();
+  const application = Keypair.generate();
+  let collection: PublicKey, document: PublicKey;
+  let collectionBump: number, documentBump: number;
+
+  it('should create application', async () => {
+    // act
+    await program.rpc.createApplication({
+      accounts: {
+        application: application.publicKey,
+        authority: program.provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      },
+      signers: [application],
+    });
+    // assert
+    const applicationAccount = await program.account.application.fetch(
+      application.publicKey
+    );
+    assert.ok(applicationAccount.count.eq(new BN(0)));
+    assert.ok(
+      applicationAccount.authority.equals(program.provider.wallet.publicKey)
+    );
+  });
 
   it('should create collection', async () => {
     // arrange
-    const [collection, bump] = await findCollectionAddress();
+    [collection, collectionBump] = await PublicKey.findProgramAddress(
+      [utils.bytes.utf8.encode('collection'), application.publicKey.toBuffer()],
+      program.programId
+    );
     // act
-    await program.rpc.createCollection(bump, {
+    await program.rpc.createCollection(collectionBump, {
       accounts: {
-        collection: collection,
+        collection,
+        application: application.publicKey,
         authority: program.provider.wallet.publicKey,
-        systemProgram: web3.SystemProgram.programId,
+        systemProgram: SystemProgram.programId,
       },
     });
     // assert
+    const applicationAccount = await program.account.application.fetch(
+      application.publicKey
+    );
     const collectionAccount = await program.account.collection.fetch(
       collection
     );
-    assert.equal(collectionAccount.count, 0);
+    assert.ok(applicationAccount.count.eq(new BN(1)));
+    assert.ok(collectionAccount.count.eq(new BN(0)));
     assert.ok(
       collectionAccount.authority.equals(program.provider.wallet.publicKey)
     );
@@ -38,25 +67,26 @@ describe('demobase-alpha', () => {
 
   it('should create document', async () => {
     // arrange
-    const [collection] = await findCollectionAddress();
+    [document, documentBump] = await PublicKey.findProgramAddress(
+      [Buffer.from('document', 'utf-8'), application.publicKey.toBuffer()],
+      program.programId
+    );
     const content = 'sample content';
     // act
-    await program.rpc.createDocument(content, {
+    await program.rpc.createDocument(content, documentBump, {
       accounts: {
-        document: document1.publicKey,
-        collection: collection,
+        document,
+        collection,
+        application: application.publicKey,
         authority: program.provider.wallet.publicKey,
-        systemProgram: web3.SystemProgram.programId,
+        systemProgram: SystemProgram.programId,
       },
-      signers: [document1],
     });
     // assert
     const collectionAccount = await program.account.collection.fetch(
       collection
     );
-    const documentAccount = await program.account.document.fetch(
-      document1.publicKey
-    );
+    const documentAccount = await program.account.document.fetch(document);
     assert.ok(collectionAccount.count.eq(new BN(1)));
     assert.ok(
       documentAccount.authority.equals(program.provider.wallet.publicKey)
@@ -74,20 +104,17 @@ describe('demobase-alpha', () => {
   it('should update document', async () => {
     // arrange
     const content = 'sample content';
-    const [collection] = await findCollectionAddress();
     // act
     await program.rpc.updateDocument(content, {
       accounts: {
-        document: document1.publicKey,
-        collection: collection,
+        document,
+        collection,
         authority: program.provider.wallet.publicKey,
-        systemProgram: web3.SystemProgram.programId,
+        systemProgram: SystemProgram.programId,
       },
     });
     // assert
-    const documentAccount = await program.account.document.fetch(
-      document1.publicKey
-    );
+    const documentAccount = await program.account.document.fetch(document);
     assert.equal(
       utils.bytes.utf8.decode(
         new Uint8Array(
@@ -99,15 +126,13 @@ describe('demobase-alpha', () => {
   });
 
   it('should delete document', async () => {
-    // arrange
-    const [collection] = await findCollectionAddress();
     // act
     await program.rpc.deleteDocument({
       accounts: {
-        document: document1.publicKey,
-        collection: collection,
+        document,
+        collection,
         authority: program.provider.wallet.publicKey,
-        systemProgram: web3.SystemProgram.programId,
+        systemProgram: SystemProgram.programId,
       },
     });
     // assert
