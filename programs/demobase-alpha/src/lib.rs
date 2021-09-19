@@ -82,7 +82,7 @@ pub struct CreateCollection<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(content: String,bump: u8)]
+#[instruction(content: String, bump: u8)]
 pub struct CreateDocument<'info> {
     #[account(
         init, 
@@ -90,7 +90,8 @@ pub struct CreateDocument<'info> {
         space = 8 + 32 + 32 + 32 + 32 + 1,
         seeds = [
             b"document".as_ref(), 
-            application.key().as_ref()
+            application.key().as_ref(),
+            collection.key().as_ref()
         ], 
         bump = bump
     )]

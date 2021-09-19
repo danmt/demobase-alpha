@@ -68,7 +68,11 @@ describe('demobase-alpha', () => {
   it('should create document', async () => {
     // arrange
     [document, documentBump] = await PublicKey.findProgramAddress(
-      [Buffer.from('document', 'utf-8'), application.publicKey.toBuffer()],
+      [
+        Buffer.from('document', 'utf-8'),
+        application.publicKey.toBuffer(),
+        collection.toBuffer(),
+      ],
       program.programId
     );
     const content = 'sample content';
