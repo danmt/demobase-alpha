@@ -5,15 +5,21 @@ import {
   utils,
   workspace,
 } from '@project-serum/anchor';
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Keypair, SystemProgram } from '@solana/web3.js';
 import { assert } from 'chai';
+
+import {
+  createCollectionAddress,
+  createDocumentAddress,
+  findCollectionAddress,
+  findDocumentAddress,
+} from './utils';
 
 describe('demobase-alpha', () => {
   // Configure the client to use the local cluster.
   setProvider(Provider.env());
   const program = workspace.DemobaseAlpha;
   const application = Keypair.generate();
-  let collection: PublicKey, document: PublicKey;
   let collectionBump: number, documentBump: number;
 
   it('should create application', async () => {
@@ -38,12 +44,12 @@ describe('demobase-alpha', () => {
 
   it('should create collection', async () => {
     // arrange
-    [collection, collectionBump] = await PublicKey.findProgramAddress(
-      [utils.bytes.utf8.encode('collection'), application.publicKey.toBuffer()],
-      program.programId
+    const [collection, bump] = await findCollectionAddress(
+      application.publicKey
     );
+    collectionBump = bump;
     // act
-    await program.rpc.createCollection(collectionBump, {
+    await program.rpc.createCollection(bump, {
       accounts: {
         collection,
         application: application.publicKey,
@@ -67,15 +73,16 @@ describe('demobase-alpha', () => {
 
   it('should create document', async () => {
     // arrange
-    [document, documentBump] = await PublicKey.findProgramAddress(
-      [
-        Buffer.from('document', 'utf-8'),
-        application.publicKey.toBuffer(),
-        collection.toBuffer(),
-      ],
-      program.programId
+    const collection = await createCollectionAddress(
+      application.publicKey,
+      collectionBump
+    );
+    const [document, bump] = await findDocumentAddress(
+      application.publicKey,
+      collection
     );
     const content = 'sample content';
+    documentBump = bump;
     // act
     await program.rpc.createDocument(content, documentBump, {
       accounts: {
@@ -98,7 +105,7 @@ describe('demobase-alpha', () => {
     assert.equal(
       utils.bytes.utf8.decode(
         new Uint8Array(
-          documentAccount.content.filter((segment) => segment !== 0)
+          documentAccount.content.filter((segment: number) => segment !== 0)
         )
       ),
       content
@@ -107,7 +114,16 @@ describe('demobase-alpha', () => {
 
   it('should update document', async () => {
     // arrange
-    const content = 'sample content';
+    const collection = await createCollectionAddress(
+      application.publicKey,
+      collectionBump
+    );
+    const document = await createDocumentAddress(
+      application.publicKey,
+      collection,
+      documentBump
+    );
+    const content = 'updated sample content';
     // act
     await program.rpc.updateDocument(content, {
       accounts: {
@@ -122,7 +138,7 @@ describe('demobase-alpha', () => {
     assert.equal(
       utils.bytes.utf8.decode(
         new Uint8Array(
-          documentAccount.content.filter((segment) => segment !== 0)
+          documentAccount.content.filter((segment: number) => segment !== 0)
         )
       ),
       content
@@ -130,6 +146,16 @@ describe('demobase-alpha', () => {
   });
 
   it('should delete document', async () => {
+    // arrange
+    const collection = await createCollectionAddress(
+      application.publicKey,
+      collectionBump
+    );
+    const document = await createDocumentAddress(
+      application.publicKey,
+      collection,
+      documentBump
+    );
     // act
     await program.rpc.deleteDocument({
       accounts: {
