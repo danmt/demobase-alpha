@@ -89,7 +89,7 @@ pub struct CreateDocument<'info> {
         payer = authority, 
         space = 8 + 32 + 32 + 32 + 32 + 1,
         seeds = [
-            b"document".as_ref(), 
+            b"document", 
             application.key().as_ref(),
             collection.key().as_ref()
         ], 
