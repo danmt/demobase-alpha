@@ -34,11 +34,13 @@ export const createCollectionAddress = (
 
 export const findDocumentAddress = (
   applicationId: PublicKey,
-  collectionId: PublicKey
+  collectionId: PublicKey,
+  documentId: string
 ) => {
   return PublicKey.findProgramAddress(
     [
       Buffer.from('document', 'utf8'),
+      Buffer.from(documentId, 'utf-8'),
       applicationId.toBuffer(),
       collectionId.toBuffer(),
     ],
@@ -49,11 +51,13 @@ export const findDocumentAddress = (
 export const createDocumentAddress = (
   applicationId: PublicKey,
   collectionId: PublicKey,
+  documentId: string,
   bump: number
 ) => {
   return PublicKey.createProgramAddress(
     [
       Buffer.from('document', 'utf-8'),
+      Buffer.from(documentId, 'utf-8'),
       applicationId.toBuffer(),
       collectionId.toBuffer(),
       Uint8Array.from([bump]),

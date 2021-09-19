@@ -25,9 +25,10 @@ pub mod demobase {
         Ok(())
     }
 
-    pub fn create_document(ctx: Context<CreateDocument>, content: String, bump: u8) -> ProgramResult {
+    pub fn create_document(ctx: Context<CreateDocument>, id: String, content: String, bump: u8) -> ProgramResult {
         msg!("Create document");
         ctx.accounts.collection.count += 1;
+        ctx.accounts.document.id = parse_string(id);
         ctx.accounts.document.content = parse_string(content);
         ctx.accounts.document.bump = bump;
         ctx.accounts.document.authority = ctx.accounts.authority.key();
@@ -86,14 +87,15 @@ pub struct CreateCollection<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(content: String, bump: u8)]
+#[instruction(id: String, content: String, bump: u8)]
 pub struct CreateDocument<'info> {
     #[account(
         init, 
         payer = authority, 
-        space = 8 + 32 + 1 + 32 + 32 + 32,
+        space = 8 + 32 + 1 + 32 + 32 + 32 + 32,
         seeds = [
             b"document", 
+            id.as_bytes(),
             application.key().as_ref(),
             collection.key().as_ref()
         ], 
@@ -150,6 +152,7 @@ pub struct Document {
     pub application: Pubkey,
     pub collection: Pubkey,
     pub content: [u8; 32],
+    pub id: [u8; 32],
 }
 
 pub fn parse_string(string: String) -> [u8; 32] {

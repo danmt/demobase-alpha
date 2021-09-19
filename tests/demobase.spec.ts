@@ -21,6 +21,7 @@ describe('demobase', () => {
   const program = workspace.Demobase;
   const application = Keypair.generate();
   let collectionBump: number, documentBump: number;
+  const documentId = 'ABCD1234';
 
   it('should create application', async () => {
     // arrange
@@ -78,22 +79,23 @@ describe('demobase', () => {
   it('should create document', async () => {
     // arrange
     const collectionName = 'things';
-    const collection = await createCollectionAddress(
+    const collectionId = await createCollectionAddress(
       application.publicKey,
       collectionName,
       collectionBump
     );
     const [document, bump] = await findDocumentAddress(
       application.publicKey,
-      collection
+      collectionId,
+      documentId
     );
     const content = 'sample content';
     documentBump = bump;
     // act
-    await program.rpc.createDocument(content, documentBump, {
+    await program.rpc.createDocument(documentId, content, documentBump, {
       accounts: {
         document,
-        collection,
+        collection: collectionId,
         application: application.publicKey,
         authority: program.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
@@ -101,7 +103,7 @@ describe('demobase', () => {
     });
     // assert
     const collectionAccount = await program.account.collection.fetch(
-      collection
+      collectionId
     );
     const documentAccount = await program.account.document.fetch(document);
     assert.ok(collectionAccount.count.eq(new BN(1)));
@@ -121,14 +123,15 @@ describe('demobase', () => {
   it('should update document', async () => {
     // arrange
     const collectionName = 'things';
-    const collection = await createCollectionAddress(
+    const collectionId = await createCollectionAddress(
       application.publicKey,
       collectionName,
       collectionBump
     );
     const document = await createDocumentAddress(
       application.publicKey,
-      collection,
+      collectionId,
+      documentId,
       documentBump
     );
     const content = 'updated sample content';
@@ -136,7 +139,7 @@ describe('demobase', () => {
     await program.rpc.updateDocument(content, {
       accounts: {
         document,
-        collection,
+        collection: collectionId,
         authority: program.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       },
@@ -156,28 +159,29 @@ describe('demobase', () => {
   it('should delete document', async () => {
     // arrange
     const collectionName = 'things';
-    const collection = await createCollectionAddress(
+    const collectionId = await createCollectionAddress(
       application.publicKey,
       collectionName,
       collectionBump
     );
     const document = await createDocumentAddress(
       application.publicKey,
-      collection,
+      collectionId,
+      documentId,
       documentBump
     );
     // act
     await program.rpc.deleteDocument({
       accounts: {
         document,
-        collection,
+        collection: collectionId,
         authority: program.provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       },
     });
     // assert
     const collectionAccount = await program.account.collection.fetch(
-      collection
+      collectionId
     );
     assert.ok(collectionAccount.count.eq(new BN(0)));
   });
