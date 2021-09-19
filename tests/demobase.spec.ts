@@ -19,13 +19,12 @@ describe('demobase', () => {
   // Configure the client to use the local cluster.
   setProvider(Provider.env());
   const program = workspace.Demobase;
-  const application = Keypair.generate();
   let collectionBump: number, documentBump: number;
   const documentId = 'ABCD1234';
+  const applicationName = 'myApp';
+  const application = Keypair.generate();
 
   it('should create application', async () => {
-    // arrange
-    const applicationName = 'myApp';
     // act
     await program.rpc.createApplication(applicationName, {
       accounts: {
@@ -42,6 +41,14 @@ describe('demobase', () => {
     assert.ok(applicationAccount.count.eq(new BN(0)));
     assert.ok(
       applicationAccount.authority.equals(program.provider.wallet.publicKey)
+    );
+    assert.equal(
+      utils.bytes.utf8.decode(
+        new Uint8Array(
+          applicationAccount.name.filter((segment: number) => segment !== 0)
+        )
+      ),
+      applicationName
     );
   });
 

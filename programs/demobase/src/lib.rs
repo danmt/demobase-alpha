@@ -54,9 +54,9 @@ pub mod demobase {
 #[instruction(name: String)]
 pub struct CreateApplication<'info> {
     #[account(
-        init, 
-        payer = authority, 
-        space = 8 + 32 + 8 + 32, 
+        init,
+        payer = authority,
+        space = 8 + 32 + 8 + 32,
     )]
     pub application: Box<Account<'info, Application>>,
     #[account(mut)]
@@ -68,14 +68,14 @@ pub struct CreateApplication<'info> {
 #[instruction(name: String, bump: u8)]
 pub struct CreateCollection<'info> {
     #[account(
-        init, 
-        payer = authority, 
-        space = 8 + 32 + 1 + 32 + 8 + 32, 
+        init,
+        payer = authority,
+        space = 8 + 32 + 1 + 32 + 8 + 32,
         seeds = [
             b"collection",
             name.as_bytes(),
             application.key().as_ref()
-        ], 
+        ],
         bump = bump
     )]
     pub collection: Box<Account<'info, Collection>>,
@@ -90,15 +90,15 @@ pub struct CreateCollection<'info> {
 #[instruction(id: String, content: String, bump: u8)]
 pub struct CreateDocument<'info> {
     #[account(
-        init, 
-        payer = authority, 
+        init,
+        payer = authority,
         space = 8 + 32 + 1 + 32 + 32 + 32 + 32,
         seeds = [
-            b"document", 
+            b"document",
             id.as_bytes(),
             application.key().as_ref(),
             collection.key().as_ref()
-        ], 
+        ],
         bump = bump
     )]
     pub document: Box<Account<'info, Document>>,
@@ -139,7 +139,7 @@ pub struct Application {
 #[account]
 pub struct Collection {
     pub authority: Pubkey,
-    pub bump: u8, 
+    pub bump: u8,
     pub application: Pubkey,
     pub count: u64,
     pub name: [u8; 32],
